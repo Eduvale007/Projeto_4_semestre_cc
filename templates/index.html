@@ -1,0 +1,149 @@
+
+{% include "header.html"%}
+
+    <!-- Header Navigation -->
+    <nav class="header-nav">
+        <div class="nav-container">
+            <div class="logo">GestãoPro</div>
+            <div class="nav-tabs">
+                <a class="nav-tab active" onclick="showTab('estoque')">Estoque</a>
+                <a class="nav-tab" onclick="showTab('previsao')">Previsão de Demanda</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Estoque Tab -->
+        <div id="estoque" class="tab-content active">
+            <div class="page-header">
+                <h1 class="page-title">Gerenciar Estoque</h1>
+                <p class="page-subtitle">Controle completo do seu inventário</p>
+            </div>
+
+            <!-- Dashboard Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #3b82f6;" id="totalProducts">0</div>
+                    <div class="stat-label">Total de Produtos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #dc2626;" id="lowStockCount">0</div>
+                    <div class="stat-label">Estoque Baixo</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #059669;" id="totalValue">R$ 0</div>
+                    <div class="stat-label">Valor Total</div>
+                </div>
+            </div>
+
+            <!-- Add Product Form -->
+            <div class="form-section">
+                <h2 class="form-title">Adicionar Produto</h2>
+                <form id="productForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="productName">Nome do Produto</label>
+                            <input type="text" id="productName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="category">Categoria</label>
+                            <select id="category" required>
+                                <option value="">Selecione uma categoria</option>
+                                <option value="Eletrônicos">Eletrônicos</option>
+                                <option value="Roupas">Roupas</option>
+                                <option value="Alimentação">Alimentação</option>
+                                <option value="Casa">Casa e Jardim</option>
+                                <option value="Livros">Livros</option>
+                                <option value="Outros">Outros</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="currentStock">Quantidade</label>
+                            <input type="number" id="currentStock" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="minStock">Estoque Mínimo</label>
+                            <input type="number" id="minStock" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="unitPrice">Preço Unitário (R$)</label>
+                            <input type="number" id="unitPrice" min="0" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn">Salvar Produto</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Products Table -->
+            <div class="table-container">
+                <div class="table-header">
+                    <h3 class="table-title">Lista de Produtos</h3>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome do Produto</th>
+                            <th>Categoria</th>
+                            <th>Quantidade</th>
+                            <th>Estoque Mín.</th>
+                            <th>Preço Unit.</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsTable">
+                        <tr>
+                            <td colspan="7" style="text-align: center; color: #6b7280; padding: 40px;">
+                                Nenhum produto cadastrado
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-grid" style="margin-top: 32px;">
+                <div class="chart-card">
+                    <h3 class="chart-title">Distribuição por Categoria</h3>
+                    <canvas id="categoryChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3 class="chart-title">Níveis de Estoque</h3>
+                    <canvas id="stockChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Previsão Tab -->
+        <div id="previsao" class="tab-content">
+            <div class="page-header">
+                <h1 class="page-title">Previsão de Demanda</h1>
+                <p class="page-subtitle">Análise preditiva baseada em regressão linear</p>
+            </div>
+
+            <div class="form-section">
+                <h2 class="form-title">Gerar Previsão</h2>
+                <div class="prediction-form">
+                    <div class="form-group">
+                        <label for="predictProduct">Produto para Previsão</label>
+                        <select id="predictProduct">
+                            <option value="">Selecione um produto</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="predictDays">Dias para Previsão</label>
+                        <input type="number" id="predictDays" min="1" max="365" value="30">
+                    </div>
+                    <div class="form-group">
+                        <button onclick="generatePrediction()" class="btn">Gerar Previsão</button>
+                    </div>
+                </div>
+                <div id="predictionResult"></div>
+            </div>
+        </div>
+    </div>
+
+{% include "footer.html"%}
