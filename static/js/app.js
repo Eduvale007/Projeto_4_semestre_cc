@@ -40,6 +40,8 @@
         }
 
         // Handle adding new product
+
+        /*
         function handleAddProduct(e) {
             e.preventDefault();
             
@@ -71,6 +73,49 @@
             document.getElementById('lowStockCount').textContent = lowStockCount;
             document.getElementById('totalValue').textContent = `R$ ${totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
         }
+            */
+           // Handle adding new product
+ 
+/*        
+function handleAddProduct(e) {
+    e.preventDefault(); // Evita o envio padrão do form
+
+    // Pega os dados do formulário
+    const product = {
+        productName: document.getElementById('productName').value,
+        category: document.getElementById('category').value,
+        currentStock: parseInt(document.getElementById('currentStock').value),
+        minStock: parseInt(document.getElementById('minStock').value),
+        unitPrice: parseFloat(document.getElementById('unitPrice').value)
+    };
+
+    // Atualiza o array local e front-end
+    products.push({
+        name: product.productName,
+        category: product.category,
+        stock: product.currentStock,
+        minStock: product.minStock,
+        price: product.unitPrice
+    });
+    updateDashboard();
+    renderProductsTable();
+    updateCharts();
+    updateProductSelect();
+
+    // Envia os dados para o Flask/MySQL via POST
+    fetch("/insertProduct", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(product)
+    })
+    .then(res => res.json())
+    .then(data => console.log(data.message))
+    .catch(err => console.error("Erro ao enviar para o servidor:", err));
+
+    // Reseta o formulário
+    document.getElementById('productForm').reset();
+}
+    */
 
         // Render products table
         function renderProductsTable() {

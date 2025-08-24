@@ -1,8 +1,11 @@
 
 import mysql.connector
 from mysql.connector import Error
+from dotenv import load_dotenv
 import os
 
+
+load_dotenv()
 
 
 def get_connection_db():
@@ -15,7 +18,7 @@ def get_connection_db():
         )
 
         if conn.is_connected():
-            print('Conectado ao bando de dados com sucesso!!!')
+            print('Conectado ao banco de dados com sucesso para inserir dados!!!')
             return conn
         else:
             print('Erro ao se conectar ao banco')
