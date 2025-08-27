@@ -26,3 +26,4 @@ def insert_product():
     flash('Dados inseridos com sucesso!')
     return redirect(url_for('paginas.home'))
 
+

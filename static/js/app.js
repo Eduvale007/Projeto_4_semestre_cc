@@ -1,14 +1,9 @@
  // Global variables
-        let products = [];
+        
+ let products = [];
         let categoryChart, stockChart;
 
-        // Sample data for demonstration
-        const sampleProducts = [
-            { name: "Parafuso Sextavado 1/4", stock: 1500, minStock: 500, price: 0.25, category: "Parafusos" },
-            { name: "Arruela Lisa 1/4", stock: 3200, minStock: 1000, price: 0.15, category: "Arruelas" },
-            { name: "Porca 1/4", stock: 2100, minStock: 800, price: 0.20, category: "Porcas" }
-        ];
-
+  
         // Tab navigation
         function showTab(tabName) {
             // Hide all tab contents
@@ -28,94 +23,24 @@
 
         // Initialize the application
         function init() {
-            // Load sample data
-            products = [...sampleProducts];
-            updateDashboard();
-            renderProductsTable();
-            initializeCharts();
-            updateProductSelect();
-            
-            // Add form event listener
-            document.getElementById('productForm').addEventListener('submit', handleAddProduct);
-        }
+ // Substitui os produtos de demonstração pelos do backend
+    products = productsFromBackend.length ? productsFromBackend.map(p => ({
+        name: p.nome_produto,
+        category: p.categoria,
+        stock: p.quantidade,
+        minStock: p.estoque_minimo,
+        price: p.preco_unitario
+    })) : [];
 
-        // Handle adding new product
-
-        /*
-        function handleAddProduct(e) {
-            e.preventDefault();
-            
-            const product = {
-                name: document.getElementById('productName').value,
-                stock: parseInt(document.getElementById('currentStock').value),
-                minStock: parseInt(document.getElementById('minStock').value),
-                price: parseFloat(document.getElementById('unitPrice').value),
-                category: document.getElementById('category').value
-            };
-            
-            products.push(product);
-            updateDashboard();
-            renderProductsTable();
-            updateCharts();
-            updateProductSelect();
-            
-            // Reset form
-            document.getElementById('productForm').reset();
-        }
-
-        // Update dashboard statistics
-        function updateDashboard() {
-            const totalProducts = products.length;
-            const lowStockCount = products.filter(p => p.stock <= p.minStock).length;
-            const totalValue = products.reduce((sum, p) => sum + (p.stock * p.price), 0);
-            
-            document.getElementById('totalProducts').textContent = totalProducts;
-            document.getElementById('lowStockCount').textContent = lowStockCount;
-            document.getElementById('totalValue').textContent = `R$ ${totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
-        }
-            */
-           // Handle adding new product
- 
-/*        
-function handleAddProduct(e) {
-    e.preventDefault(); // Evita o envio padrão do form
-
-    // Pega os dados do formulário
-    const product = {
-        productName: document.getElementById('productName').value,
-        category: document.getElementById('category').value,
-        currentStock: parseInt(document.getElementById('currentStock').value),
-        minStock: parseInt(document.getElementById('minStock').value),
-        unitPrice: parseFloat(document.getElementById('unitPrice').value)
-    };
-
-    // Atualiza o array local e front-end
-    products.push({
-        name: product.productName,
-        category: product.category,
-        stock: product.currentStock,
-        minStock: product.minStock,
-        price: product.unitPrice
-    });
     updateDashboard();
     renderProductsTable();
-    updateCharts();
+    initializeCharts();
     updateProductSelect();
+    
+    // Adiciona listener do formulário
+    document.getElementById('productForm').addEventListener('submit', handleAddProduct);
+        }
 
-    // Envia os dados para o Flask/MySQL via POST
-    fetch("/insertProduct", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(product)
-    })
-    .then(res => res.json())
-    .then(data => console.log(data.message))
-    .catch(err => console.error("Erro ao enviar para o servidor:", err));
-
-    // Reseta o formulário
-    document.getElementById('productForm').reset();
-}
-    */
 
         // Render products table
         function renderProductsTable() {

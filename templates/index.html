@@ -142,7 +142,7 @@
 
             </div>
 
-            <!-- Charts Section -->
+            <!-- Charts Section 
             <div class="charts-grid" style="margin-top: 32px;">
                 <div class="chart-card">
                     <h3 class="chart-title">Distribuição por Categoria</h3>
@@ -154,6 +154,46 @@
                 </div>
             </div>
         </div>
+        -->
+<div class="charts-grid">
+    <!-- Distribuição por Categoria -->
+    <div class="chart-card">
+        <h3 class="chart-title">Distribuição por Categoria</h3>
+        <div class="chart">
+            {% set category_counts = {} %}
+            {% for produto in produtos %}
+                {% set _ = category_counts.update({produto.categoria: (category_counts.get(produto.categoria, 0) + produto.quantidade)}) %}
+            {% endfor %}
+            {% set max_category = category_counts.values() | max %}
+            
+            {% for categoria, quantidade in category_counts.items() %}
+                {% set percentual = (quantidade / max_category * 100) | round(2) %}
+                <div class="bar" style="width: {{ percentual }}%;">
+                    <span>{{ categoria }} ({{ quantidade }})</span>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Níveis de Estoque -->
+    <div class="chart-card">
+        <h3 class="chart-title">Níveis de Estoque</h3>
+        <div class="chart">
+            {% for produto in produtos %}
+                {% set percentual = (produto.quantidade / produto.estoque_minimo * 100) %}
+                {% if percentual > 100 %}
+                    {% set percentual = 100 %}
+                {% endif %}
+                <div class="bar stock-bar" style="width: {{ percentual | round(2) }}%;">
+                    <span>{{ produto.nome_produto }} ({{ produto.quantidade }}/{{ produto.estoque_minimo }})</span>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+
+
 
         <!-- Previsão Tab -->
         <div id="previsao" class="tab-content">
@@ -183,5 +223,9 @@
             </div>
         </div>
     </div>
+
+
+
+    
 
 {% include "footer.html"%}
