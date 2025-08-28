@@ -1,7 +1,8 @@
 
 {% include "header.html"%}
 
-    <!-- Header Navigation -->
+
+ <!-- Header Navigation -->
     <nav class="header-nav">
         <div class="nav-container">
             <div class="logo">GestãoPro</div>
@@ -12,7 +13,8 @@
         </div>
     </nav>
 
-    <!-- Main Container -->
+
+ <!-- Main Container -->
     <div class="main-container">
         <!-- Estoque Tab -->
         <div id="estoque" class="tab-content active">
@@ -40,15 +42,15 @@
             <!-- Add Product Form -->
             <div class="form-section">
                 <h2 class="form-title">Adicionar Produto</h2>
-                <form id="productForm" action="{{ url_for('paginas.insert_product') }}" method="post">
+                <form id="productForm">
                     <div class="form-grid">
                         <div class="form-group">
                             <label for="productName">Nome do Produto</label>
-                            <input type="text" id="productName" required name="productName">
+                            <input type="text" id="productName" required>
                         </div>
                         <div class="form-group">
                             <label for="category">Categoria</label>
-                            <select id="category" required name="category">
+                            <select id="category" required>
                                 <option value="">Selecione uma categoria</option>
                                 <option value="Eletrônicos">Eletrônicos</option>
                                 <option value="Roupas">Roupas</option>
@@ -60,15 +62,15 @@
                         </div>
                         <div class="form-group">
                             <label for="currentStock">Quantidade</label>
-                            <input type="number" id="currentStock" min="0" required name="currentStock">
+                            <input type="number" id="currentStock" min="0" required>
                         </div>
                         <div class="form-group">
                             <label for="minStock">Estoque Mínimo</label>
-                            <input type="number" id="minStock" min="0" required name="minStock">
+                            <input type="number" id="minStock" min="0" required>
                         </div>
                         <div class="form-group">
                             <label for="unitPrice">Preço Unitário (R$)</label>
-                            <input type="number" id="unitPrice" min="0" step="0.01" required name="unitPrice">
+                            <input type="number" id="unitPrice" min="0" step="0.01" required>
                         </div>
                         <div class="form-group">
                             <button type="submit" class="btn">Salvar Produto</button>
@@ -78,33 +80,7 @@
             </div>
 
             <!-- Products Table -->
-            <div class="table-container">
-                <div class="table-header">
-                    <h3 class="table-title">Lista de Produtos</h3>
-                </div>
-                <!--
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nome do Produto</th>
-                            <th>Categoria</th>
-                            <th>Quantidade</th>
-                            <th>Estoque Mín.</th>
-                            <th>Preço Unit.</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="productsTable">
-                        <tr>
-                            <td colspan="7" style="text-align: center; color: #6b7280; padding: 40px;">
-                                Nenhum produto cadastrado
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                -->
-                <table class="table">
+            <table class="table">
     <thead>
         <tr>
             <th>ID</th>
@@ -138,11 +114,9 @@
         </tr>
         {% endfor %}
     </tbody>
-    </table>
+</table>
 
-            </div>
-
-            <!-- Charts Section 
+            <!-- Charts Section -->
             <div class="charts-grid" style="margin-top: 32px;">
                 <div class="chart-card">
                     <h3 class="chart-title">Distribuição por Categoria</h3>
@@ -154,46 +128,8 @@
                 </div>
             </div>
         </div>
-        -->
-<div class="charts-grid">
-    <!-- Distribuição por Categoria -->
-    <div class="chart-card">
-        <h3 class="chart-title">Distribuição por Categoria</h3>
-        <div class="chart">
-            {% set category_counts = {} %}
-            {% for produto in produtos %}
-                {% set _ = category_counts.update({produto.categoria: (category_counts.get(produto.categoria, 0) + produto.quantidade)}) %}
-            {% endfor %}
-            {% set max_category = category_counts.values() | max %}
-            
-            {% for categoria, quantidade in category_counts.items() %}
-                {% set percentual = (quantidade / max_category * 100) | round(2) %}
-                <div class="bar" style="width: {{ percentual }}%;">
-                    <span>{{ categoria }} ({{ quantidade }})</span>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
 
-    <!-- Níveis de Estoque -->
-    <div class="chart-card">
-        <h3 class="chart-title">Níveis de Estoque</h3>
-        <div class="chart">
-            {% for produto in produtos %}
-                {% set percentual = (produto.quantidade / produto.estoque_minimo * 100) %}
-                {% if percentual > 100 %}
-                    {% set percentual = 100 %}
-                {% endif %}
-                <div class="bar stock-bar" style="width: {{ percentual | round(2) }}%;">
-                    <span>{{ produto.nome_produto }} ({{ produto.quantidade }}/{{ produto.estoque_minimo }})</span>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-</div>
-
-
-
+  
 
         <!-- Previsão Tab -->
         <div id="previsao" class="tab-content">
@@ -224,7 +160,247 @@
         </div>
     </div>
 
+    <script>
+          // =====================
+  // Backend products
+  // =====================
+  // Supondo que você está usando um template engine (Flask, Django, etc.)
+  // Substitua {{ produtos | tojson }} pelo seu backend
+ 
 
+  // =====================
+  // Global variables
+  // =====================
+  let products = [];
+  let categoryChart, stockChart;
+
+  // =====================
+  // Tab navigation
+  // =====================
+  function showTab(tabName, event) {
+    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+
+    document.getElementById(tabName).classList.add('active');
+    if (event) event.currentTarget.classList.add('active');
+  }
+
+  // =====================
+  // Initialize application
+  // =====================
+async function init() {
+    try {
+        const response = await fetch('/api/produtos');
+        const productsFromBackend = await response.json();
+
+        products = productsFromBackend.map(p => ({
+            name: p.nome_produto,
+  category: p.categoria,
+  stock: Number(p.quantidade),
+  minStock: Number(p.estoque_minimo),
+  price: Number(p.preco_unitario) 
+        }));
+
+        updateDashboard();
+        renderProductsTable();
+        initializeCharts();
+        updateProductSelect();
+
+        const form = document.getElementById('productForm');
+        if (form) form.addEventListener('submit', handleAddProduct);
+
+    } catch (error) {
+        console.error('Erro ao carregar produtos do backend:', error);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', init);
+  // =====================
+  // Dashboard statistics
+  // =====================
+  function updateDashboard() {
+    const totalProducts = products.length;
+    const lowStockCount = products.filter(p => p.stock <= p.minStock).length;
+    const totalValue = products.reduce((sum, p) => sum + (p.stock * p.price), 0);
+
+    document.getElementById('totalProducts').textContent = totalProducts;
+    document.getElementById('lowStockCount').textContent = lowStockCount;
+    document.getElementById('totalValue').textContent = `R$ ${totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+  }
+
+  // =====================
+  // Render products table
+  // =====================
+  function renderProductsTable() {
+    const tbody = document.getElementById('productsTable');
+
+    if (!products.length) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#6b7280;padding:40px;">Nenhum produto cadastrado</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = products.map((product, index) => {
+      const stockStatus = product.stock <= product.minStock ? 'status-low' :
+                          product.stock <= product.minStock * 1.5 ? 'status-warning' : 'status-normal';
+
+      return `
+        <tr>
+          <td>${index + 1}</td>
+          <td>${product.name}</td>
+          <td>${product.category}</td>
+          <td class="${stockStatus}">${product.stock}</td>
+          <td>${product.minStock}</td>
+          <td>R$ ${product.price.toFixed(2)}</td>
+          <td>
+            <button onclick="editProduct(${index})" class="btn-edit">Editar</button>
+            <button onclick="removeProduct(${index})" class="btn-delete">Excluir</button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  // =====================
+  // Remove product
+  // =====================
+  function removeProduct(index) {
+    if (confirm('Tem certeza que deseja remover este produto?')) {
+      products.splice(index, 1);
+      updateDashboard();
+      renderProductsTable();
+      updateCharts();
+      updateProductSelect();
+    }
+  }
+
+  // =====================
+  // Edit product placeholder
+  // =====================
+  function editProduct(index) {
+    alert('Funcionalidade de edição será implementada em breve!');
+  }
+
+  // =====================
+  // Initialize charts
+  // =====================
+  function initializeCharts() {
+      const categoryCanvas = document.getElementById('categoryChart');
+    const stockCanvas = document.getElementById('stockChart');
+
+    if (!categoryCanvas || !stockCanvas) {
+        console.error("Canvas dos gráficos não encontrados no DOM!");
+        return;
+    }
+
+    const categoryCtx = categoryCanvas.getContext('2d');
+    const stockCtx = stockCanvas.getContext('2d');
+
+    categoryChart = new Chart(categoryCtx, {
+        type: 'doughnut',
+        data: { labels: [], datasets: [{ data: [], backgroundColor: ['#3b82f6','#1d4ed8','#06b6d4','#0891b2','#059669','#047857','#dc2626','#b91c1c'] }] },
+        options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+    });
+
+    stockChart = new Chart(stockCtx, {
+        type: 'bar',
+        data: { labels: [], datasets: [
+            { label: 'Estoque Atual', data: [], backgroundColor: 'rgba(59,130,246,0.8)', borderColor:'#3b82f6', borderWidth:2 },
+            { label: 'Estoque Mínimo', data: [], backgroundColor: 'rgba(220,38,38,0.8)', borderColor:'#dc2626', borderWidth:2 }
+        ] },
+        options: { responsive:true, scales: { y:{ beginAtZero:true } } }
+    });
+
+    updateCharts();
+  }
+
+  // =====================
+  // Update charts
+  // =====================
+  function updateCharts() {
+    // Category chart
+    const categoryData = {};
+    products.forEach(p => { categoryData[p.category] = (categoryData[p.category] || 0) + 1; });
+
+    categoryChart.data.labels = Object.keys(categoryData);
+    categoryChart.data.datasets[0].data = Object.values(categoryData);
+    categoryChart.update();
+
+    // Stock chart (top 8)
+    const topProducts = products.slice(0, 8);
+    stockChart.data.labels = topProducts.map(p => p.name.length > 20 ? p.name.substring(0,20)+'...' : p.name);
+    stockChart.data.datasets[0].data = topProducts.map(p => p.stock);
+    stockChart.data.datasets[1].data = topProducts.map(p => p.minStock);
+    stockChart.update();
+  }
+
+  // =====================
+  // Update product select for prediction
+  // =====================
+  function updateProductSelect() {
+    const select = document.getElementById('predictProduct');
+    select.innerHTML = '<option value="">Selecione um produto</option>' +
+      products.map((p,i)=>`<option value="${i}">${p.name}</option>`).join('');
+  }
+
+  // =====================
+  // Prediction
+  // =====================
+  function generatePrediction() {
+    const productIndex = document.getElementById('predictProduct').value;
+    const days = parseInt(document.getElementById('predictDays').value);
+
+    if (!productIndex || !days) { alert('Selecione produto e número de dias'); return; }
+
+    const product = products[productIndex];
+    const historicalData = generateHistoricalData(product);
+    const prediction = calculateLinearRegression(historicalData, days);
+
+    const resultDiv = document.getElementById('predictionResult');
+    resultDiv.innerHTML = `
+      <div class="prediction-result">
+        <div class="prediction-value">${prediction.demand} unidades</div>
+        <div>Demanda prevista para ${days} dias - ${product.name}</div>
+        <div style="margin-top:10px;">Tendência: ${prediction.trend>0?'📈 Crescente':prediction.trend<0?'📉 Decrescente':'➡️ Estável'}</div>
+        <div class="prediction-recommendation"><strong>Recomendação:</strong><br>${prediction.recommendation}</div>
+      </div>
+    `;
+  }
+
+  function generateHistoricalData(product) {
+    const data = [];
+    const base = Math.max(1, Math.floor(product.stock/30));
+    for(let i=30;i>=0;i--){
+      const variation=(Math.random()-0.5)*0.4;
+      const seasonality=Math.sin(i*Math.PI/15)*0.2;
+      const trend=-i*0.01;
+      data.push({day:30-i,demand:Math.max(1,Math.floor(base*(1+variation+seasonality+trend)))});
+    }
+    return data;
+  }
+
+  function calculateLinearRegression(data, forecastDays) {
+    const n=data.length;
+    const sumX=data.reduce((s,d)=>s+d.day,0);
+    const sumY=data.reduce((s,d)=>s+d.demand,0);
+    const sumXY=data.reduce((s,d)=>s+d.day*d.demand,0);
+    const sumX2=data.reduce((s,d)=>s+d.day*d.day,0);
+    const slope=(n*sumXY-sumX*sumY)/(n*sumX2-sumX*sumX);
+    const intercept=(sumY-slope*sumX)/n;
+    const futureDemand=Math.max(1,Math.floor(slope*(30+forecastDays)+intercept));
+
+    let recommendation="";
+    if(slope>0.5) recommendation="Demanda crescente detectada. Considere aumentar o estoque em 20-30%.";
+    else if(slope<-0.5) recommendation="Demanda decrescente. Monitore o estoque para evitar excesso.";
+    else recommendation="Demanda estável. Mantenha os níveis atuais de estoque.";
+
+    return {demand:futureDemand, trend:slope, recommendation};
+  }
+
+  // =====================
+  // Initialize on page load
+  // =====================
+  document.addEventListener('DOMContentLoaded', init);
+    </script>
 
     
 

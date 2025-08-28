@@ -1,5 +1,6 @@
-from flask import  Blueprint , render_template ,  request, flash, redirect, url_for
+from flask import  Blueprint , render_template ,  request, flash, redirect, url_for, jsonify
 from models import insert_productData , get_all_products
+from config import get_connection_db
 
 
 paginas = Blueprint('paginas', __name__)
@@ -27,3 +28,13 @@ def insert_product():
     return redirect(url_for('paginas.home'))
 
 
+@paginas.route('/api/produtos', methods=['GET'])
+def get_products():
+    conn = get_connection_db()
+
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM produtos")
+    produtos = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(produtos)
