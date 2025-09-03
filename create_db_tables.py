@@ -43,11 +43,14 @@ def setup_database():
                     """)
         
         cursor.execute("""
-                    CREATE TABLE Movimentacao (id_movimentacao INT AUTO_INCREMENT PRIMARY KEY,
-                       id_produto INT NOT NULL,
-                       quantidade INT NOT NULL,
-                       tipo ENUM('entrada', 'saida') NOT NULL,
-                       data_movimentacao DATE NOT NULL, FOREIGN KEY (id_produto) REFERENCES produtos(id_produto) );
+                 CREATE TABLE Vendas (
+                    id_venda INT AUTO_INCREMENT PRIMARY KEY,
+                    id_produto INT NOT NULL,
+                    quantidade_vendida INT NOT NULL,
+                    valor_total DECIMAL(10,2) NOT NULL,
+                    data_venda TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (id_produto) REFERENCES Produtos(id_produto)
+);
                     """)
         
         conn.commit()
