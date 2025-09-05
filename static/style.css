@@ -185,6 +185,97 @@
             background: #2563eb;
         }
 
+        /* Edit form */
+    .form-section-edit {
+  opacity: 0;
+  transform: translateY(-20px);
+  max-height: 0;
+   background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  position: relative; /* necessário para o botão fechar */
+}
+
+.form-section-edit.open {
+  opacity: 1;
+  transform: translateY(0);
+  max-height: 1000px; /* ajuste conforme o tamanho do formulário */
+}
+
+        .form-title-edit {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+
+        .form-grid-edit {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group-edit {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group-edit label {
+            color: #374151;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+
+        .form-group-edit input,
+        .form-group-edit select {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-group-edit input:focus,
+        .form-group-edit select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+
+ 
+
+
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #999;
+  padding: 0;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+.close-btn:hover {
+  color: #333;
+  background-color: #f0f0f0;
+}
+
+
         .btn-edit {
             background: #f59e0b;
             color: white;
