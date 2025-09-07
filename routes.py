@@ -1,5 +1,5 @@
 from flask import  Blueprint , render_template ,  request, flash, redirect, url_for, jsonify
-from models import insert_productData , get_all_products
+from models import insert_productData , get_all_products, update_productData
 from config import get_connection_db
 
 
@@ -28,6 +28,27 @@ def insert_product():
     flash('Dados inseridos com sucesso!')
     return redirect(url_for('paginas.home'))
 
+
+@paginas.route('/edit/produtos/<int:produto_id>', methods=['PUT'])
+def update_produto(produto_id):
+    data = request.get_json()
+
+    try:
+        update_productData(
+            data['nome'],
+            data['estoque_atual'],
+            data['preco_unitario'],
+            data['categoria'],
+            data['estoque_minimo'],
+            produto_id
+        )
+        return jsonify({"message": "Produto atualizado com sucesso!"})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+
+
 @paginas.route('/api/produtos', methods=['GET'])
 def get_products():
     conn = get_connection_db()
@@ -54,3 +75,6 @@ def delete_product(produto_id):
     cursor.close()
     conn.close()
     return jsonify({'message': f'Produto com ID {produto_id} deletado com sucesso!'})
+
+
+

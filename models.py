@@ -32,3 +32,31 @@ def get_all_products():
     finally:
         cursor.close()
         conn.close()
+
+        
+
+def update_productData(productName_update, currentStock_update, unitPrice_update, category_update, minStock_update, product_id):
+    conn = get_connection_db()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute('''
+            UPDATE produtos
+            SET nome_produto = %s,
+                quantidade = %s,
+                preco_unitario = %s,
+                categoria = %s,
+                estoque_minimo = %s
+            WHERE id_produto = %s
+        ''', (productName_update, currentStock_update, unitPrice_update, category_update, minStock_update, product_id))
+
+        conn.commit()
+        print("Produto atualizado com sucesso!")
+
+    except Exception as e:
+        print("Erro ao atualizar produto:", e)
+        conn.rollback()
+
+    finally:
+        cursor.close()
+        conn.close()

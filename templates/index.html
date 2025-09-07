@@ -102,7 +102,7 @@
             <td>{{ produto.estoque_minimo }}</td>
             <td>R$ {{ produto.preco_unitario }}</td>
             <td>
-                <button class="btn-edit">Editar</button>
+                <button  data-id="{{produto.id_produto}}" class="btn-edit">Editar</button>
                 <button data-id="{{produto.id_produto}}" class="btn-delete">Excluir</button>
             </td>
         </tr>
@@ -120,15 +120,16 @@
             <!-- Edit Product Form -->
             <div class="form-section-edit">
                 <h2 class="form-title-edit">Editar produto</h2>
-                <form id="productForm" action="/insertProduct" method="POST">
+                <form id="productForm_edit">
+                    <input type="hidden" id="productId" name="productId">
                     <div class="form-grid-edit">
                         <div class="form-group-edit">
                             <label for="productName">Nome do Produto</label>
-                            <input type="text" id="productName" required name="productName-edit">
+                            <input type="text" id="productName_edit" required name="productName-edit">
                         </div>
                         <div class="form-group-edit">
                             <label for="category">Categoria</label>
-                            <select id="category" required name="category">
+                            <select id="category_edit" required name="category-edit">
                                 <option value="">Selecione uma categoria</option>
                                 <option value="Eletrônicos">Eletrônicos</option>
                                 <option value="Roupas">Roupas</option>
@@ -140,15 +141,15 @@
                         </div>
                         <div class="form-group-edit">
                             <label for="currentStock">Quantidade</label>
-                            <input type="number" id="currentStock" min="0" required name="currentStock-edit">
+                            <input type="number" id="currentStock_edit" min="0" required name="currentStock-edit">
                         </div>
                         <div class="form-group-edit">
                             <label for="minStock">Estoque Mínimo</label>
-                            <input type="number" id="minStock" min="0" required name="minStock-edit">
+                            <input type="number" id="minStock_edit" min="0" required name="minStock-edit">
                         </div>
                         <div class="form-group-edit">
                             <label for="unitPrice">Preço Unitário (R$)</label>
-                            <input type="number" id="unitPrice" min="0" step="0.01" required name="unitPrice-edit">
+                            <input type="number" id="unitPrice_edit" min="0" step="0.01" required name="unitPrice-edit">
                         </div>
                         <div class="form-group-edit">
                             <button type="submit" class="btn">Salvar Produto Editado</button>
@@ -289,7 +290,7 @@ document.addEventListener('DOMContentLoaded', init);
           <td>${product.minStock}</td>
           <td>R$ ${product.price.toFixed(2)}</td>
           <td>
-            <button class="btn-edit">Editar</button>
+            <button data-id="${product.id_produto}" class="btn-edit">Editar</button>
             <button data-id="${product.id_produto}" class="btn-delete">Excluir</button>
           </td>
         </tr>
@@ -350,6 +351,8 @@ document.addEventListener('keydown', function(e) {
     closeForm(activeEditButton);
   }
 });
+
+
   }
 
   
@@ -375,6 +378,67 @@ document.addEventListener('click', async (e) => {
 });
 
 
+// Preenche o formulário ao clicar em "Editar"
+document.addEventListener('click', (e) => {
+  if (e.target.classList.contains('btn-edit')) {
+    const btn = e.target;
+    const produto = products.find(p => p.id_produto == btn.dataset.id);
+
+    if (!produto) return alert("Produto não encontrado.");
+
+    // Preenche o formulário
+    document.getElementById('productId').value = produto.id_produto;
+    document.getElementById('productName_edit').value = produto.name;
+    document.getElementById('category_edit').value = produto.category;
+    document.getElementById('currentStock_edit').value = produto.stock;
+    document.getElementById('minStock_edit').value = produto.minStock;
+    document.getElementById('unitPrice_edit').value = produto.price;
+
+    // Abre formulário
+    document.querySelector('.form-section-edit').classList.add('open');
+  }
+});
+
+//  Enviar formulário via fetch (PUT)
+const editForm = document.getElementById('productForm_edit');
+editForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const produtoId = document.getElementById('productId').value;
+  if (!produtoId) return alert("ID do produto não encontrado.");
+
+  const nome = document.getElementById('productName_edit').value;
+  const categoria = document.getElementById('category_edit').value;
+  const estoque = document.getElementById('currentStock_edit').value;
+  const estoqueMinimo = document.getElementById('minStock_edit').value;
+  const preco = document.getElementById('unitPrice_edit').value;
+
+  try {
+    const response = await fetch(`/edit/produtos/${produtoId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nome,
+        categoria,
+        estoque_atual: estoque,
+        estoque_minimo: estoqueMinimo,
+        preco_unitario: preco
+      })
+    });
+
+    const data = await response.json();
+    alert(data.message || data.error);
+
+    if (!data.error) {
+      await init(); // recarrega lista de produtos
+      editForm.reset();
+      document.querySelector('.form-section-edit').classList.remove('open');
+    }
+  } catch (err) {
+    console.error("Erro ao editar produto:", err);
+  }
+});
+
 
 
  
@@ -391,9 +455,15 @@ document.addEventListener('click', async (e) => {
         console.error("Canvas dos gráficos não encontrados no DOM!");
         return;
     }
+ 
 
     const categoryCtx = categoryCanvas.getContext('2d');
     const stockCtx = stockCanvas.getContext('2d');
+
+
+     // Destrói gráficos existentes antes de criar novos
+    if (categoryChart) categoryChart.destroy();
+    if (stockChart) stockChart.destroy();
 
     categoryChart = new Chart(categoryCtx, {
         type: 'doughnut',
